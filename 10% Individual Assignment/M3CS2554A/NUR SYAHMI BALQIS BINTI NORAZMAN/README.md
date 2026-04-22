@@ -56,6 +56,17 @@ def run_parallel(data, users):
 * calculate_similarity() - Compares two user's music taste
 * recommend_for_user() - Generates top 5 song recommendations
 
+# Scalling Data Table
+
+| Data Size | Sequential | Concurrent | Parallel | Speedup |
+|-----------|------------|------------|----------|---------|
+| 100K records | 2.5s | 2.4s | 1.2s | **2.08x** |
+| 500K records | 8.2s | 7.8s | 2.8s | **2.93x** |
+| 1M records | 15.4s | 14.2s | 4.5s | **3.42x** |
+| 2M records | 28.9s | 26.5s | 7.8s | **3.71x** |
+| 3.5M records | 45.7s | 42.3s | 12.9s | **3.54x** |
+| 4M records | 52.3s | 48.1s | 14.6s | **3.58x** |
+
 # Result & Performance Analysis
 ## Expected Output
 ```ssh
