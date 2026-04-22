@@ -13,6 +13,16 @@
   * Examine each sequential, concurrent, and parallel system's performance.
   * Explain why CPU-intensive jobs benefit from parallel programming.
 
+# Project Scope
+
+* Data Size: 3,000,000 listening records
+* Users: 5,000 unique users
+* Songs: 2,000 unique songs
+* Target Users: 10 random users for recommendation
+* Programming Language: Python 3.10+
+* Platform: Ubuntu 22.04
+
+
 # Three Implementations
 * Sequential - One by one
 * Concurrent - Threading
@@ -51,92 +61,83 @@ def run_parallel(data, users):
 
 ## Key Function
 
-* generate_data() - Creates 10,000 listening record
-* get_user_history() - Finds all songs a user listened to
-* calculate_similarity() - Compares two user's music taste
-* recommend_for_user() - Generates top 5 song recommendations
+* generate_data_fast() - Creates 3M synthetic records
+* build_user_database()	- Converts records to dictionary
+* calculate_similarity_fast()	- Compares two users' music taste
+* recommend_for_user_fast()	- Generates top 5 recommendations
+* run_sequential()	- Processes users one by one
+* run_concurrent() - Uses threading with GIL
+* run_parallel()	- Uses multiprocessing on cores	
 
 # Scalling Data Table
 
-| Data Size | Sequential | Concurrent | Parallel | Speedup |
-|-----------|------------|------------|----------|---------|
-| 100K records | 2.5s | 2.4s | 1.2s | **2.08x** |
-| 500K records | 8.2s | 7.8s | 2.8s | **2.93x** |
-| 1M records | 15.4s | 14.2s | 4.5s | **3.42x** |
-| 2M records | 28.9s | 26.5s | 7.8s | **3.71x** |
-| 3.5M records | 45.7s | 42.3s | 12.9s | **3.54x** |
-| 4M records | 52.3s | 48.1s | 14.6s | **3.58x** |
+| Data Size | Sequential | Concurrent | Parallel | Winner |
+|-----------|------------|------------|----------|--------|
+| 100K | 0.08s | 0.09s | 2.34s | Sequential |
+| 500K | 0.12s | 0.13s | 4.56s | Sequential |
+| 1M | 0.18s | 0.19s | 6.78s | Sequential |
+| 2M | 0.22s | 0.23s | 9.12s | Sequential |
+| 3.5M | 0.25s | 0.25s | 11.31s | Sequential |
 
-# Performance Benchmark - Parallel Music Recommender
 
-1. Concurrent (Threads) : 42.34 Seconds
-2. Parallel (8 Cores)   : 12.89 Seconds  
-3. Sequential (1 Core)  : 45.67 Seconds
-4. Performance Gain: 3.54x Faster (Parallel vs Sequential)
 
----
-
-ITT440 Performance Benchmark: Parallel Music Recommender
-Data Size: 3,500,000 Records | Users: 50,000 | Songs: 5,000
-
-Y-axis: Execution Time (Seconds)
-  50 |
-     |                                    █
-  40 |                                    █
-     |                                    █
-  30 |                                    █
-     |                                    █
-  20 |                                    █
-     |                    █               █
-  10 |                    █               █
-     |                    █               █
-   0 └─────────────────────────────────────────
-        Sequential     Concurrent      Parallel
-        (1 Core)       (Threads)       (8 Cores)
-        
-        █ Sequential: 45.67s
-        █ Concurrent: 42.34s  
-        █ Parallel:   12.89s  WINNER!
 
 # Result & Performance Analysis
 ## Expected Output
 ```ssh
-==================================================
-SIMPLE PARALLEL MUSIC RECOMMENDER
-==================================================
-Generating 10,000 listening records...
-Generated 10000 records for 1000 users and 500 songs
-Generating recommendations for 10 users...
- 
->SEQUENTIAL< Processing...
-Completed in 11.64 seconds
- 
->CONCURRENT - Threading< Processing...
-Completed in 12.07 seconds
- 
->PARALLEL - Multiprocessing< Processing...
-Completed in 5.58 seconds
- 
-==================================================
+======================================================================
+# Performance Benchmark - Parallel Music Recommender
+======================================================================
+Generating 3,500,000 listening records...
+   Generated in 15.89 seconds
+Building user database...
+   Built for 50,000 users in 2.78 seconds
+
+Processing recommendations for 10 users
+
+ SEQUENTIAL (1 Core) - Processing...
+   Processing user 1/10...
+   Processing user 2/10...
+   Processing user 3/10...
+   Processing user 4/10...
+   Processing user 5/10...
+   Processing user 6/10...
+   Processing user 7/10...
+   Processing user 8/10...
+   Processing user 9/10...
+   Processing user 10/10...
+    Completed in 10.13 seconds
+
+ CONCURRENT (Threading) - Processing...
+    Completed in 11.48 seconds
+
+ PARALLEL (Multiprocessing) - Processing...
+   Using 4 CPU cores
+    Completed in 12.46 seconds
+
+======================================================================
 PERFORMANCE COMPARISON
-==================================================
-Method                    Time (seconds)  Speedup   
---------------------------------------------------
-Sequential                11.64           1.00x     
-Concurrent (Threads)      12.07           0.96      x
-Parallel (Processes)      5.58            2.09      x
- 
-==================================================
-SAMPLE RECOMMENDATIONS (Parallel Method)
-==================================================
- 
-User 2: Recommended songs [443, 5, 401]
- 
-User 444: Recommended songs [323, 7, 206]
- 
-User 383: Recommended songs [373, 32, 271]
- 
-Program complete! Parallel processing is fastest for CPU-intensive tasks.
+======================================================================
+
+Method                         Time (seconds)     Speedup     
+----------------------------------------------------------------------
+Sequential (1 Core)            10.13              1.00x       
+Concurrent (Threads)           11.48              0.88        x
+Parallel (Multiprocessing)     12.46              0.81        x
+
+======================================================================
+PERFORMANCE SUMMARY
+======================================================================
+
+   Data Size: 3,500,000 records
+   Users: 50,000
+   Target Users: 10
+
+    Sequential is faster. Data size may need to be larger.
+
+======================================================================
+PROGRAM COMPLETE!
+======================================================================
 ```
 
 ## Summary 
