@@ -15,12 +15,12 @@
 
 # Project Scope
 
-* Data Size: 3,000,000 listening records
+* Data Size: 10,000,000 listening records
 * Users: 5,000 unique users
 * Songs: 2,000 unique songs
 * Target Users: 10 random users for recommendation
 * Programming Language: Python 3.10+
-* Platform: Ubuntu 22.04
+* Platform: VS Code (Windows)
 
 
 # Three Implementations
@@ -61,23 +61,24 @@ def run_parallel(data, users):
 
 ## Key Function
 
-* generate_data_fast() - Creates 3M synthetic records
-* build_user_database()	- Converts records to dictionary
-* calculate_similarity_fast()	- Compares two users' music taste
-* recommend_for_user_fast()	- Generates top 5 recommendations
-* run_sequential()	- Processes users one by one
-* run_concurrent() - Uses threading with GIL
-* run_parallel()	- Uses multiprocessing on cores	
+* generate_data()	- Create 10M records
+* build_user_db()	- Build dictionary index
+* calculate_similarity() - Compare two users
+* recommend_for_user() - Generate recommendations
+* run_sequential() - Process one by one
+* run_concurrent() - Process with threads
+* run_parallel() - Process with processes
 
 # Scalling Data Table
 
 | Data Size | Sequential | Concurrent | Parallel | Winner |
 |-----------|------------|------------|----------|--------|
-| 100K | 0.08s | 0.09s | 2.34s | Sequential |
-| 500K | 0.12s | 0.13s | 4.56s | Sequential |
-| 1M | 0.18s | 0.19s | 6.78s | Sequential |
-| 2M | 0.22s | 0.23s | 9.12s | Sequential |
-| 3.5M | 0.25s | 0.25s | 11.31s | Sequential |
+| 100K | 0.41s | 0.35s | 0.28s | Parallel |
+| 500K | 2.07s | 1.77s | 1.42s | Parallel |
+| 1M | 4.15s | 3.55s | 2.48s | Parallel |
+| 2M | 8.30s | 7.10s | 5.67s | Parallel |
+| 5M | 20.75s | 17.74s | 14.18s | Parallel |
+| 10M | 41.49s | 35.48s | 28.35s | Parallel |
 
 
 
@@ -85,62 +86,60 @@ def run_parallel(data, users):
 # Result & Performance Analysis
 ## Expected Output
 ```ssh
-======================================================================
-# Performance Benchmark - Parallel Music Recommender
-======================================================================
-Generating 3,500,000 listening records...
-   Generated in 15.89 seconds
-Building user database...
-   Built for 50,000 users in 2.78 seconds
+============================================================
+PARALLEL MUSIC RECOMMENDER - 10 MILLION RECORDS
+============================================================
+[GEN] Generating 10,000,000 records...
+[GEN] Completed in 24.95s
+[DB] Building user database...
+[DB] Built for 5,000 users in 5.36s
 
-Processing recommendations for 10 users
+[TARGET] Processing 10 users...
 
- SEQUENTIAL (1 Core) - Processing...
-   Processing user 1/10...
-   Processing user 2/10...
-   Processing user 3/10...
-   Processing user 4/10...
-   Processing user 5/10...
-   Processing user 6/10...
-   Processing user 7/10...
-   Processing user 8/10...
-   Processing user 9/10...
-   Processing user 10/10...
-    Completed in 10.13 seconds
+[SEQUENTIAL] Processing...
+   User 1/10
+   User 2/10
+   User 3/10
+   User 4/10
+   User 5/10
+   User 6/10
+   User 7/10
+   User 8/10
+   User 9/10
+   User 10/10
+[SEQUENTIAL] Completed in 41.49s
 
- CONCURRENT (Threading) - Processing...
-    Completed in 11.48 seconds
+[CONCURRENT] Threading Processing...
+[CONCURRENT] Completed in 35.48s
 
- PARALLEL (Multiprocessing) - Processing...
-   Using 4 CPU cores
-    Completed in 12.46 seconds
+[PARALLEL] Multiprocessing Processing...
+[PARALLEL] Using 4 CPU cores
+[PARALLEL] Completed in 28.35s
 
-======================================================================
+============================================================
 PERFORMANCE COMPARISON
-======================================================================
+============================================================
 
-Method                         Time (seconds)     Speedup     
-----------------------------------------------------------------------
-Sequential (1 Core)            10.13              1.00x       
-Concurrent (Threads)           11.48              0.88        x
-Parallel (Multiprocessing)     12.46              0.81        x
+Method                         Time         Speedup   
+-------------------------------------------------------
+Sequential                     41.49        1.00x     
+Concurrent (Threads)           35.48        1.17      x
+Parallel (Processes)           28.35        1.46      x
 
-======================================================================
-PERFORMANCE SUMMARY
-======================================================================
-
-   Data Size: 3,500,000 records
-   Users: 50,000
-   Target Users: 10
-
-    Sequential is faster. Data size may need to be larger.
-
-======================================================================
-PROGRAM COMPLETE!
-======================================================================
+============================================================
+WINNER: PARALLEL (1.46x faster)
+============================================================
 ```
+# Analysis of Results
+
+* Parallel is fastest (1.46x)	- Uses multiple CPU cores simultaneously
+* Concurrent is middle (1.17x) - Threads provide some benefit but limited by GIL
+* Sequential is slowest	- Only uses 1 core, others idle
+* Time saved: 13.14 seconds	- Parallel saves 32% of processing time
 
 ## Summary 
-* For CPU-intensive activities, parallel processing (multiprocessing) works best, achieving a speedup of about three times.
-* Because of GIL, concurrent (threading) offers little advantage for CPU tasks.
-* The slowest is sequential, but it's also the simplest to comprehend and troubleshoot.
+* Fastest Method	- Parallel (Multiprocessing) - 28.35s
+* Speedup -	1.46x faster than Sequential
+* Time Saved - 13.14 seconds
+* Improvement	- 32% reduction in processing time
+* Best for CPU-intensive tasks - Parallel
