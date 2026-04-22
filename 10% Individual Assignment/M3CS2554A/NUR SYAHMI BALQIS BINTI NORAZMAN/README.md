@@ -67,6 +67,37 @@ def run_parallel(data, users):
 | 3.5M records | 45.7s | 42.3s | 12.9s | **3.54x** |
 | 4M records | 52.3s | 48.1s | 14.6s | **3.58x** |
 
+# Performance Benchmark - Parallel Music Recommender
+
+1. Concurrent (Threads) : 42.34 Seconds
+2. Parallel (8 Cores)   : 12.89 Seconds  
+3. Sequential (1 Core)  : 45.67 Seconds
+4. Performance Gain: 3.54x Faster (Parallel vs Sequential)
+
+---
+
+ITT440 Performance Benchmark: Parallel Music Recommender
+Data Size: 3,500,000 Records | Users: 50,000 | Songs: 5,000
+
+Y-axis: Execution Time (Seconds)
+  50 |
+     |                                    █
+  40 |                                    █
+     |                                    █
+  30 |                                    █
+     |                                    █
+  20 |                                    █
+     |                    █               █
+  10 |                    █               █
+     |                    █               █
+   0 └─────────────────────────────────────────
+        Sequential     Concurrent      Parallel
+        (1 Core)       (Threads)       (8 Cores)
+        
+        █ Sequential: 45.67s
+        █ Concurrent: 42.34s  
+        █ Parallel:   12.89s  WINNER!
+
 # Result & Performance Analysis
 ## Expected Output
 ```ssh
