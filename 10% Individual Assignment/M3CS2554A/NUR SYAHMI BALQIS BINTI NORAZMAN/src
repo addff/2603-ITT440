@@ -3,169 +3,256 @@ import random
 import threading
 import multiprocessing
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-
-# ==================== DATA GENERATION ====================
-
-def generate_data():
-    """Generate 10,000 user-song listening records"""
-    print("Generating 10,000 listening records...")
-    data = []
-    for i in range(10000):
-        user_id = random.randint(1, 1000)
-        song_id = random.randint(1, 500)
-        listens = random.randint(1, 100)
-        data.append((user_id, song_id, listens))
+from collections import defaultdict
+ 
+# ==================== CONFIGURATION ====================
+NUM_RECORDS = 3_000_000  # 3 million records
+NUM_USERS = 5000
+NUM_SONGS = 2000
+NUM_TARGET = 10
+ 
+# ==================== OPTIMIZED DATA GENERATION ====================
+ 
+def generate_data_fast():
+    """Generate 3M records FAST"""
+    print(f" Generating {NUM_RECORDS:,} listening records...")
+    start_gen = time.time()
+ 
+    random.seed(42)
+    data = [
+        (random.randint(1, NUM_USERS), 
+         random.randint(1, NUM_SONGS), 
+         random.randint(1, 100))
+        for _ in range(NUM_RECORDS)
+    ]
+ 
+    gen_time = time.time() - start_gen
+    print(f"    Generated in {gen_time:.2f} seconds")
+    print(f"    Memory: ~{len(data) * 3 * 28 / 1024 / 1024:.1f} MB")
     return data
-
-# ==================== RECOMMENDATION ENGINE ====================
-
-def get_user_history(data, user_id):
-    """Get all songs listened by a user (CPU intensive)"""
-    history = {}
-    for uid, song, listens in data:
-        if uid == user_id:
-            history[song] = listens
-    return history
-
-def calculate_similarity(history1, history2):
-    """Calculate similarity between two users (CPU intensive)"""
-    common = set(history1.keys()) & set(history2.keys())
+ 
+# ==================== BUILD USER DATABASE ====================
+ 
+def build_user_database(data):
+    """Build user database once - speeds up everything"""
+    print(" Building user database index...")
+    start = time.time()
+ 
+    user_db = defaultdict(dict)
+    for user_id, song_id, listens in data:
+        user_db[user_id][song_id] = listens
+ 
+    build_time = time.time() - start
+    print(f"    Built database for {len(user_db):,} users in {build_time:.2f} seconds")
+    return user_db
+ 
+# ==================== FAST RECOMMENDATION ENGINE ====================
+ 
+def calculate_similarity_fast(history1, history2):
+    """Fast similarity calculation"""
+    # Get common songs
+    if len(history1) < len(history2):
+        common = [s for s in history1.keys() if s in history2]
+    else:
+        common = [s for s in history2.keys() if s in history1]
+ 
     if not common:
-        return 0
-    
-    # Simple similarity score
-    score = sum(min(history1[song], history2[song]) for song in common)
-    return score / (len(history1) + len(history2))
-
-def recommend_for_user(data, target_user, all_users):
-    """Generate recommendations for a single user"""
-    target_history = get_user_history(data, target_user)
-    
-    # Find similar users
+        return 0.0
+ 
+    score = sum(min(history1[s], history2[s]) for s in common)
+    total = len(history1) + len(history2)
+ 
+    return score / total if total > 0 else 0.0
+ 
+def recommend_for_user_fast(target_user, user_db, all_users, max_check=500):
+    """Fast recommendation - checks 500 users for speed"""
+    target_history = user_db.get(target_user, {})
+ 
+    if not target_history:
+        return []
+ 
+    # Sample random users for speed
+    if len(all_users) > max_check:
+        sample_users = random.sample(all_users, max_check)
+    else:
+        sample_users = all_users
+ 
     similarities = []
-    for user in all_users:
+    for user in sample_users:
         if user != target_user:
-            user_history = get_user_history(data, user)
-            sim = calculate_similarity(target_history, user_history)
-            similarities.append((user, sim))
-    
-    # Sort by similarity and get top 3 similar users
+            user_history = user_db.get(user, {})
+            if user_history:
+                sim = calculate_similarity_fast(target_history, user_history)
+                similarities.append((user, sim))
+ 
+    # Get top 3 similar users
     similarities.sort(key=lambda x: x[1], reverse=True)
     top_users = similarities[:3]
-    
-    # Recommend songs from similar users
+ 
+    # Generate recommendations
     recommendations = {}
-    for user, sim in top_users:
-        user_history = get_user_history(data, user)
+    for user, sim_score in top_users:
+        user_history = user_db.get(user, {})
         for song, listens in user_history.items():
             if song not in target_history:
-                recommendations[song] = recommendations.get(song, 0) + listens * sim
-    
+                recommendations[song] = recommendations.get(song, 0) + listens * sim_score
+ 
     # Return top 5 recommendations
-    top_songs = sorted(recommendations.items(), key=lambda x: x[1], reverse=True)[:5]
-    return [song for song, score in top_songs]
-
+    top_recs = sorted(recommendations.items(), key=lambda x: x[1], reverse=True)[:5]
+    return [song for song, _ in top_recs]
+ 
 # ==================== SEQUENTIAL VERSION ====================
-
-def run_sequential(data, target_users):
-    """Process users one by one"""
-    print("\nSEQUENTIAL Processing...")
+ 
+def run_sequential(user_db, target_users):
+    """SEQUENTIAL - Process one user at a time"""
+    print("\n SEQUENTIAL (1 Core) - Processing...")
     start = time.time()
-    
-    all_users = list(set(uid for uid, _, _ in data))
+ 
+    all_users = list(user_db.keys())
     results = []
-    for user in target_users:
-        recs = recommend_for_user(data, user, all_users)
+ 
+    for i, user in enumerate(target_users):
+        print(f"   Processing user {i+1}/{len(target_users)}...")
+        recs = recommend_for_user_fast(user, user_db, all_users)
         results.append(recs)
-    
+ 
     elapsed = time.time() - start
-    print(f"Completed in {elapsed:.2f} seconds")
+    print(f"    Completed in {elapsed:.2f} seconds")
     return results, elapsed
-
+ 
 # ==================== CONCURRENT VERSION (THREADING) ====================
-
-def run_concurrent(data, target_users):
-    """Process users concurrently using threads"""
-    print("\nCONCURRENT - Threading Processing...")
+ 
+def run_concurrent(user_db, target_users):
+    """CONCURRENT - Use threading (multiple threads)"""
+    print("\n CONCURRENT (Threading) - Processing...")
     start = time.time()
-    
-    all_users = list(set(uid for uid, _, _ in data))
+ 
+    all_users = list(user_db.keys())
     results = [None] * len(target_users)
-    
+ 
     def process_user(idx, user):
-        results[idx] = recommend_for_user(data, user, all_users)
-    
-    with ThreadPoolExecutor(max_workers=4) as executor:
+        """Process a single user"""
+        results[idx] = recommend_for_user_fast(user, user_db, all_users)
+ 
+    # Use 8 threads for concurrency
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = []
         for idx, user in enumerate(target_users):
-            executor.submit(process_user, idx, user)
-    
+            futures.append(executor.submit(process_user, idx, user))
+ 
+        # Wait for all threads to complete
+        for future in futures:
+            future.result()
+ 
     elapsed = time.time() - start
-    print(f"Completed in {elapsed:.2f} seconds")
+    print(f"    Completed in {elapsed:.2f} seconds")
     return results, elapsed
-
+ 
 # ==================== PARALLEL VERSION (MULTIPROCESSING) ====================
-
+ 
 def process_user_wrapper(args):
-    """Wrapper function for multiprocessing"""
-    data, user, all_users = args
-    return recommend_for_user(data, user, all_users)
-
-def run_parallel(data, target_users):
-    """Process users in parallel using multiple processes"""
-    print("\nPARALLEL - Multiprocessing Processing...")
+    """Wrapper for multiprocessing"""
+    user, user_db, all_users = args
+    return recommend_for_user_fast(user, user_db, all_users)
+ 
+def run_parallel(user_db, target_users):
+    """PARALLEL - Use multiprocessing (multiple processes)"""
+    print("\n PARALLEL (Multiprocessing) - Processing...")
     start = time.time()
-    
-    all_users = list(set(uid for uid, _, _ in data))
-    
+ 
+    all_users = list(user_db.keys())
+    num_cores = multiprocessing.cpu_count()
+    print(f"   Using {num_cores} CPU cores")
+ 
     # Prepare arguments for each process
-    args_list = [(data, user, all_users) for user in target_users]
-    
-    with ProcessPoolExecutor(max_workers=4) as executor:
+    args_list = [(user, user_db, all_users) for user in target_users]
+ 
+    with ProcessPoolExecutor(max_workers=num_cores) as executor:
         results = list(executor.map(process_user_wrapper, args_list))
-    
+ 
     elapsed = time.time() - start
-    print(f"Completed in {elapsed:.2f} seconds")
+    print(f"    Completed in {elapsed:.2f} seconds")
     return results, elapsed
-
+ 
 # ==================== MAIN PROGRAM ====================
-
+ 
 def main():
-    print("=" * 50)
-    print("SIMPLE PARALLEL MUSIC RECOMMENDER")
-    print("=" * 50)
-    
-    # Generate data
-    data = generate_data()
-    print(f"Generated {len(data)} records for 1000 users and 500 songs")
-    
-    # Select 10 random users to recommend for
-    target_users = random.sample(range(1, 1001), 10)
-    print(f"Generating recommendations for {len(target_users)} users...")
-    
-    # Run all three methods
-    seq_results, seq_time = run_sequential(data, target_users)
-    con_results, con_time = run_concurrent(data, target_users)
-    par_results, par_time = run_parallel(data, target_users)
-    
+    print("=" * 60)
+    print(" PARALLEL MUSIC RECOMMENDER - 3 MILLION RECORDS ")
+    print("=" * 60)
+ 
+    # Generate 3M records
+    data = generate_data_fast()
+ 
+    # Build user database (ONE TIME - speeds up everything)
+    user_db = build_user_database(data)
+ 
+    # Select target users
+    all_users = list(user_db.keys())
+    target_users = random.sample(all_users, min(NUM_TARGET, len(all_users)))
+    print(f"\n Processing recommendations for {len(target_users)} users")
+ 
+    # Run ALL THREE methods
+    seq_results, seq_time = run_sequential(user_db, target_users)
+    con_results, con_time = run_concurrent(user_db, target_users)
+    par_results, par_time = run_parallel(user_db, target_users)
+ 
     # Performance comparison
-    print("\n" + "=" * 50)
-    print("PERFORMANCE COMPARISON")
-    print("=" * 50)
-    print(f"{'Method':<25} {'Time (seconds)':<15} {'Speedup':<10}")
-    print("-" * 50)
-    print(f"{'Sequential':<25} {seq_time:<15.2f} {'1.00x':<10}")
-    print(f"{'Concurrent (Threads)':<25} {con_time:<15.2f} {seq_time/con_time:<10.2f}x")
-    print(f"{'Parallel (Processes)':<25} {par_time:<15.2f} {seq_time/par_time:<10.2f}x")
-    
-    # Show sample output
-    print("\n" + "=" * 50)
-    print("SAMPLE RECOMMENDATIONS (Parallel Method)")
-    print("=" * 50)
+    print("\n" + "=" * 60)
+    print(" PERFORMANCE COMPARISON")
+    print("=" * 60)
+    print(f"\n{'Method':<25} {'Time (seconds)':<18} {'Speedup':<12}")
+    print("-" * 60)
+    print(f"{' Sequential (1 Core)':<25} {seq_time:<18.2f} {'1.00x':<12}")
+    print(f"{' Concurrent (Threads)':<25} {con_time:<18.2f} {seq_time/con_time:<12.2f}x")
+    print(f"{' Parallel (Multiprocessing)':<25} {par_time:<18.2f} {seq_time/par_time:<12.2f}x")
+ 
+    # Performance analysis
+    speedup_par = seq_time / par_time
+    speedup_con = seq_time / con_time
+    time_saved_par = seq_time - par_time
+    time_saved_con = seq_time - con_time
+ 
+    print("\n" + "=" * 60)
+    print(" PERFORMANCE SUMMARY")
+    print("=" * 60)
+    print(f"\n    Data Size: 3,000,000 records")
+    print(f"    Users: {len(user_db):,}")
+    print(f"    Target Users: {len(target_users)}")
+    print(f"\n    Concurrent (Threads): {speedup_con:.2f}x faster")
+    print(f"      Time saved: {time_saved_con:.2f} seconds")
+    print(f"\n    Parallel (Processes): {speedup_par:.2f}x faster")
+    print(f"      Time saved: {time_saved_par:.2f} seconds")
+    print(f"\n    Using {multiprocessing.cpu_count()} CPU cores for parallel")
+ 
+    # Winner announcement
+    print("\n" + "=" * 60)
+    print(" WINNER")
+    print("=" * 60)
+ 
+    if par_time < con_time and par_time < seq_time:
+        print("\n  PARALLEL (Multiprocessing) is the FASTEST! ")
+        print(f"    {speedup_par:.2f}x faster than Sequential")
+        print(f"    Uses all {multiprocessing.cpu_count()} CPU cores simultaneously")
+    elif con_time < seq_time:
+        print("\n    CONCURRENT (Threading) is the FASTEST!")
+    else:
+        print("\n   Sequential was fastest (data might be too small)")
+ 
+    # Show sample recommendations
+    print("\n" + "=" * 60)
+    print(" SAMPLE RECOMMENDATIONS (Parallel Method)")
+    print("=" * 60)
     for i, user in enumerate(target_users[:3]):
-        print(f"\nUser {user}: Recommended songs {par_results[i][:3]}")
-    
-    print("\nProgram complete! Parallel processing is fastest for CPU-intensive tasks.")
-
+        songs = par_results[i][:3] if par_results[i] else []
+        print(f"\n User {user}:")
+        print(f"    Recommended songs: {songs}")
+ 
+    print("\n" + "=" * 60)
+    print(" PROGRAM COMPLETE!")
+    print(" Parallel processing is fastest for CPU-intensive tasks")
+    print("=" * 60)
+ 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
     main()
