@@ -137,6 +137,7 @@ WINNER: PARALLEL (1.46x faster)
 * Sequential is slowest	- Only uses 1 core, others idle
 * Time saved: 13.14 seconds	- Parallel saves 32% of processing time
 
+
 ## Summary 
 * Fastest Method	- Parallel (Multiprocessing) - 28.35s
 * Speedup -	1.46x faster than Sequential
