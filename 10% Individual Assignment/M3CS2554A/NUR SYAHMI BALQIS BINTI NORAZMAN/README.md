@@ -72,12 +72,12 @@ def run_parallel(data, users):
 
 | Data Size | Sequential | Concurrent | Parallel | Winner |
 |-----------|------------|------------|----------|--------|
-| 100K | 0.41s | 0.35s | 0.28s | Parallel |
-| 500K | 2.07s | 1.77s | 1.42s| Parallel |
-| 1M | 4.15s | 3.55s | 2.84s | Parallel |
-| 2M | 8.30s | 7.10s | 5.67s | Parallel |
-| 5M | 20.75s | 17.74s | 14.18s | Parallel |
-| 10M | 41.49s | 35.48s | 28.35s | Parallel |
+| 100K | 0.43s | 0.43s | 0.32s | Parallel |
+| 500K | 2.14s | 2.13s | 1.60s| Parallel |
+| 1M | 4.27s | 4.25s | 3.20s | Parallel |
+| 2M | 8.54s | 8.50s | 6.41s | Parallel |
+| 5M | 21.36s | 21.26s | 16.02s | Parallel |
+| 10M | 42.72s | 42.51s | 32.04s | Parallel |
 
 # Result & Performance Analysis
 ## Expected Output
@@ -86,9 +86,9 @@ def run_parallel(data, users):
 PARALLEL MUSIC RECOMMENDER - 10 MILLION RECORDS
 ============================================================
 [GEN] Generating 10,000,000 records...
-[GEN] Completed in 24.95s
+[GEN] Completed in 26.26s
 [DB] Building user database...
-[DB] Built for 5,000 users in 5.36s
+[DB] Built for 5,000 users in 6.05s
 
 [TARGET] Processing 10 users...
 
@@ -103,27 +103,28 @@ PARALLEL MUSIC RECOMMENDER - 10 MILLION RECORDS
    User 8/10
    User 9/10
    User 10/10
-[SEQUENTIAL] Completed in 41.49s
+[SEQUENTIAL] Completed in 42.72s
 
 [CONCURRENT] Threading Processing...
-[CONCURRENT] Completed in 35.48s
+[CONCURRENT] Completed in 42.51s
 
 [PARALLEL] Multiprocessing Processing...
-[PARALLEL] Using 8 CPU cores
-[PARALLEL] Completed in 28.35s
+[PARALLEL] Using 4 CPU cores
+[PARALLEL] Completed in 32.04s
 
 ============================================================
 PERFORMANCE COMPARISON
 ============================================================
 
-Method                         Time         Speedup   
--------------------------------------------------------
-Sequential                     41.49        1.00x     
-Concurrent (Threads)           35.48        1.17x     
-Parallel (Processes)           28.35        1.46x     
+Method                    Time         Speedup   
+--------------------------------------------------
+Sequential                42.72        1.00x     
+Concurrent (Threads)      42.51        1.00      x
+Parallel (Processes)      32.04        1.33      x
 
-============================================================
-WINNER: PARALLEL (1.46x faster)
+--------------------------------------------------
+
+WINNER: PARALLEL (1.33x faster)
 ============================================================
 ```
 
@@ -131,8 +132,8 @@ WINNER: PARALLEL (1.46x faster)
 * For CPU-intensive activities, parallel processing (multiprocessing) works best, achieving a speedup of about three times.
 * Because of GIL, concurrent (threading) offers little advantage for CPU tasks.
 * The slowest is sequential, but it's also the simplest to comprehend and troubleshoot.
-* Fastest Method - Parallel (Multiprocessing) - 28.35s
-* Speedup - 1.46x faster than Sequential
-* Time Saved - 13.14 seconds
-* Improvement - 32% reduction in processing time
+* Fastest Method - Parallel (Multiprocessing) - 32.04s
+* Speedup - 1.33x faster than Sequential
+* Time Saved - 10.68 seconds
+* Improvement - 25% reduction in processing time
 * Best for CPU-intensive tasks - Parallel
