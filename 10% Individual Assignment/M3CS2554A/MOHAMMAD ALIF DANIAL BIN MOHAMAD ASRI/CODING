@@ -1,0 +1,119 @@
+import threading
+import multiprocessing
+import time
+import math
+import random
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+
+# ============================================================
+# PROJECT SCOPE & CONFIGURATION
+# ============================================================
+DATA_SIZE = 10_000_000      # 10 Million traffic sensor records
+TOTAL_VEHICLES = 5000       # 5,000 unique vehicle IDs
+TARGET_COUNT = 10           # Benchmark target for performance analysis
+MATH_COMPLEXITY = 10**5     # Physics engine intensity
+
+# ============================================================
+# KEY FUNCTIONS
+# ============================================================
+
+def generate_traffic_data():
+    """Create 10 million simulated traffic records."""
+    print(f"[GEN] Generating {DATA_SIZE:,} traffic sensor records...")
+    # Simulating raw sensor stream data
+    return [random.randint(1, TOTAL_VEHICLES) for _ in range(DATA_SIZE)]
+
+def build_traffic_db(data):
+    """Build dictionary index for fast vehicle lookups."""
+    print(f"[DB] Building vehicle database for {TOTAL_VEHICLES} IDs...")
+    db = {i: [] for i in range(1, TOTAL_VEHICLES + 1)}
+    # Indexing first 1 million records for efficiency
+    for i, vehicle_id in enumerate(data[:1000000]): 
+        db[vehicle_id].append(i)
+    return db
+
+def calculate_physics_update(vehicle_id):
+    """
+    CPU-INTENSIVE TASK: Simulates physics engine and coordinate updates.
+    Similar to calculate_similarity() in the template.
+    """
+    calc_sum = 0
+    # Heavy math to simulate physics engine load (CPU-bound)
+    for i in range(MATH_COMPLEXITY):
+        calc_sum += math.sqrt(i) * math.tan(i)
+    
+    # Simulated I/O latency (Waiting for Traffic Signal/Sensors)
+    time.sleep(0.01) 
+    return f"Vehicle {vehicle_id} updated."
+
+# ============================================================
+# THREE IMPLEMENTATIONS
+# ============================================================
+
+def run_sequential(vehicles):
+    """Process tasks one by one."""
+    print("\n[SEQUENTIAL] Processing...")
+    start = time.perf_counter()
+    for count, v_id in enumerate(vehicles, 1):
+        print(f"   Vehicle {count}/{TARGET_COUNT}")
+        calculate_physics_update(v_id)
+    return time.perf_counter() - start
+
+def run_concurrent(vehicles):
+    """Process tasks using Threading (Interleaved)."""
+    print("\n[CONCURRENT] Threading Processing...")
+    start = time.perf_counter()
+    with ThreadPoolExecutor() as executor:
+        list(executor.map(calculate_physics_update, vehicles))
+    return time.perf_counter() - start
+
+def run_parallel(vehicles):
+    """Process tasks using Multiprocessing (Simultaneous)."""
+    print("\n[PARALLEL] Multiprocessing Processing...")
+    start = time.perf_counter()
+    # Bypasses the GIL to utilize multiple CPU cores
+    with ProcessPoolExecutor() as executor:
+        list(executor.map(calculate_physics_update, vehicles))
+    return time.perf_counter() - start
+
+# ============================================================
+# MAIN EXECUTION
+# ============================================================
+
+if __name__ == "__main__":
+    print("="*60)
+    print(f"SMART CITY TRAFFIC SIMULATOR - {DATA_SIZE:,} RECORDS")
+    print("="*60)
+
+    # 1. Initialization Phase
+    gen_start = time.perf_counter()
+    raw_traffic_data = generate_traffic_data()
+    print(f"[GEN] Completed in {time.perf_counter() - gen_start:.2f}s")
+
+    db_start = time.perf_counter()
+    traffic_db = build_traffic_db(raw_traffic_data)
+    print(f"[DB] Built for {TOTAL_VEHICLES} vehicles in {time.perf_counter() - db_start:.2f}s")
+
+    # Select target vehicles for benchmarking
+    target_vehicles = [random.randint(1, TOTAL_VEHICLES) for _ in range(TARGET_COUNT)]
+    print(f"\n[TARGET] Processing {TARGET_COUNT} target vehicles...")
+
+    # 2. Performance Benchmarking
+    time_seq = run_sequential(target_vehicles)
+    time_con = run_concurrent(target_vehicles)
+    time_par = run_parallel(target_vehicles)
+
+    # 3. Performance Summary Report
+    print("\n" + "="*60)
+    print("PERFORMANCE COMPARISON")
+    print("="*60)
+    print(f"{'Method':<25} {'Time':<15} {'Speedup':<10}")
+    print("-" * 60)
+    print(f"{'Sequential':<25} {time_seq:<15.2f} {'1.00x':<10}")
+    print(f"{'Concurrent (Threads)':<25} {time_con:<15.2f} {time_seq/time_con:<10.2f}x")
+    print(f"{'Parallel (Processes)':<25} {time_par:<15.2f} {time_seq/time_par:<10.2f}x")
+    print("="*60)
+    
+    speedup = time_seq / time_par
+    print(f"WINNER: PARALLEL ({speedup:.2f}x faster)")
+    print("="*60)
