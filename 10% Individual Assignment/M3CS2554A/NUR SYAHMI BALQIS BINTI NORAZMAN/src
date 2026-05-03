@@ -152,24 +152,25 @@ def main():
     con_results, con_time = run_concurrent(user_db, targets)
     par_results, par_time = run_parallel(user_db, targets)
     
-    # Results
+    # Results - EXACT FORMAT AS YOUR IMAGE
     print("\n" + "=" * 60)
     print("PERFORMANCE COMPARISON")
     print("=" * 60)
-    print(f"\n{'Method':<30} {'Time':<12} {'Speedup':<10}")
-    print("-" * 55)
-    print(f"{'Sequential':<30} {seq_time:<12.2f} {'1.00x':<10}")
-    print(f"{'Concurrent (Threads)':<30} {con_time:<12.2f} {seq_time/con_time:<10.2f}x")
-    print(f"{'Parallel (Processes)':<30} {par_time:<12.2f} {seq_time/par_time:<10.2f}x")
+    print()
+    print(f"{'Method':<25} {'Time':<12} {'Speedup':<10}")
+    print("-" * 50)
+    print(f"{'Sequential':<25} {seq_time:<12.2f} {'1.00x':<10}")
+    print(f"{'Concurrent (Threads)':<25} {con_time:<12.2f} {seq_time/con_time:<10.2f}x")
+    print(f"{'Parallel (Processes)':<25} {par_time:<12.2f} {seq_time/par_time:<10.2f}x")
     
     # Winner
-    print("\n" + "=" * 60)
+    print("\n" + "-" * 50)
     if par_time < seq_time:
-        print(f"WINNER: PARALLEL ({seq_time/par_time:.2f}x faster)")
+        print(f"\nWINNER: PARALLEL ({seq_time/par_time:.2f}x faster)")
     elif con_time < seq_time:
-        print(f"WINNER: CONCURRENT ({seq_time/con_time:.2f}x faster)")
+        print(f"\nWINNER: CONCURRENT ({seq_time/con_time:.2f}x faster)")
     else:
-        print(f"WINNER: SEQUENTIAL")
+        print(f"\nWINNER: SEQUENTIAL")
     print("=" * 60)
 
 if __name__ == "__main__":
