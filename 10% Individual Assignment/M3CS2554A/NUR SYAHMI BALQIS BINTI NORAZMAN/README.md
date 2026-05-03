@@ -1,7 +1,7 @@
 # PARALLEL MUSIC RECOMMENDER
 ## NUR SYAHMI BALQIS BINTI NORAZMAN
 ## 2024211386
-## Course Code: ITT440: Network Programming
+## Course Code: ITT440 - Network Programming
 ## Lecturer : Shahadan Bin Saad
 ## Youtube Link : https://youtu.be/sEZJjlcSf1A?si=M2jCR42jQZuJaunC
 ## Github Link : https://l1nq.com/zfoszmp
