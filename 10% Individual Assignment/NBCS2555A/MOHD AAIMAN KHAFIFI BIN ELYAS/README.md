@@ -40,7 +40,7 @@
 
 ### 🎥 1.1 Project Presentation Video
 &emsp;A full walk-through of the test execution, configuration files, and live Gnuplot charts can be viewed on YouTube here:
-https://youtu.be/9Ugu0dGVGr4
+https://youtu.be/axQfwSb6OoA
 
 ---
 
