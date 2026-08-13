@@ -4,7 +4,7 @@ Director Choice
 
 [Parallel Stock Market Price Simulator & Analyzer](https://github.com/addff/2603-ITT440/tree/main/10%25%20Individual%20Assignment/M3CS2554A/AHMAD%20ZARIF%20BIN%20AHMAD%20KHIR) ([Video](https://www.youtube.com/watch?v=NUmkmH9TUqg)) 
 
-[Poker Game Simulator] ([Video](https://www.youtube.com/watch?v=rw1csBi419k))
+[Poker Game Simulator](https://github.com/addff/2603-ITT440/tree/main/10%25%20Individual%20Assignment/M3CS2554A/ARIF%20AZIZAN%20BIN%20ARIFIN) ([Video](https://www.youtube.com/watch?v=rw1csBi419k))
 
 [Adaptive Hybrid Parallel Web Health Monitoring System](https://github.com/addff/2603-ITT440/tree/main/10%25%20Individual%20Assignment/M3CS2554A/MASTURA%20BINTI%20RABAEE) ([Video](https://www.youtube.com/watch?v=Pu8BO5MWfwo))
 
