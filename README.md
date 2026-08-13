@@ -1,4 +1,7 @@
 # 2603-ITT440
+## Python Parallel Programming
+Director Choice
+[Parallel Stock Market Price Simulator & Analyzer](https://github.com/addff/2603-ITT440/tree/main/10%25%20Individual%20Assignment/M3CS2554A/AHMAD%20ZARIF%20BIN%20AHMAD%20KHIR) [Video](https://www.youtube.com/watch?v=NUmkmH9TUqg) 
 ## Python Docker Container
 Why Using Docker for Python is Brilliant
 ***No More "But it works on my machine!"***
