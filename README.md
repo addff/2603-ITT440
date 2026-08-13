@@ -7,6 +7,8 @@ Director Choice
 [Adaptive Hybrid Parallel Web Health Monitoring System](https://github.com/addff/2603-ITT440/tree/main/10%25%20Individual%20Assignment/M3CS2554A/MASTURA%20BINTI%20RABAEE) ([Video](https://www.youtube.com/watch?v=Pu8BO5MWfwo))
 
 [Parallel Flight Ticket Comparator](https://github.com/addff/2603-ITT440/tree/main/10%25%20Individual%20Assignment/M3CS2554A/MUHAMMAD%20AQIL%20BIN%20KAMARUL'ARIFIN)([Video](https://www.youtube.com/watch?v=ahbZKklmuZI))
+
+[Parallel Computation of Mean for Large Numerical Datasets](https://github.com/addff/2603-ITT440/tree/main/10%25%20Individual%20Assignment/M3CS2554A/MUHAMMAD%20SYAKIR%20IZZ%20BIN%20SAMSUDIN)([Video](https://www.youtube.com/watch?v=S3YQ3JPsH7Y))
 ## Python Docker Container
 Why Using Docker for Python is Brilliant
 ***No More "But it works on my machine!"***
