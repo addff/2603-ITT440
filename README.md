@@ -9,6 +9,8 @@ Director Choice
 [Parallel Flight Ticket Comparator](https://github.com/addff/2603-ITT440/tree/main/10%25%20Individual%20Assignment/M3CS2554A/MUHAMMAD%20AQIL%20BIN%20KAMARUL'ARIFIN) ([Video](https://www.youtube.com/watch?v=ahbZKklmuZI))
 
 [Parallel Computation of Mean for Large Numerical Datasets](https://github.com/addff/2603-ITT440/tree/main/10%25%20Individual%20Assignment/M3CS2554A/MUHAMMAD%20SYAKIR%20IZZ%20BIN%20SAMSUDIN) ([Video](https://www.youtube.com/watch?v=S3YQ3JPsH7Y))
+
+[Parallel Music Recommender](https://github.com/addff/2603-ITT440/blob/main/10%25%20Individual%20Assignment/M3CS2554A/NUR%20SYAHMI%20BALQIS%20BINTI%20NORAZMAN/FULL%20REPORT.md)  ([Video](https://www.youtube.com/watch?v=sEZJjlcSf1A))
 ## Python Docker Container
 Why Using Docker for Python is Brilliant
 ***No More "But it works on my machine!"***
